@@ -34,9 +34,27 @@ Ensure the following tools are installed and properly configured:
 
 Before using SnapSwap, you'll need API tokens for both the source and destination teams.
 
-1. **Obtain API Tokens using `doctl`**:
+1. **Setting the Correct Authentication Context in `doctl`**:
 
-   If you've set up `doctl` with access to your DigitalOcean account, you can list your account's API tokens using:
+   `doctl` supports multiple authentication contexts. Ensure you're in the right context for the desired team to get accurate results.
+
+   To view your current context:
+
+   ```bash
+   doctl auth list
+   ```
+
+   To switch between contexts, use:
+
+   ```bash
+   doctl auth switch --context <CONTEXT_NAME>
+   ```
+
+   For detailed instructions on managing authentication contexts in `doctl`, please refer to the [official documentation](https://www.digitalocean.com/docs/apis-clis/doctl/how-to/use-multiple-contexts/).
+
+2. **Obtain API Tokens using `doctl`**:
+
+   With the correct context set, list your account's API tokens:
 
    ```bash
    doctl account api-tokens list
@@ -44,7 +62,7 @@ Before using SnapSwap, you'll need API tokens for both the source and destinatio
 
    Identify the appropriate tokens you wish to use for the source and destination teams. If you need to create a new API token, this can be done through the [DigitalOcean Control Panel](https://cloud.digitalocean.com/account/api/tokens).
 
-2. Set up the identified tokens as `SRC_DIGITALOCEAN_TOKEN` and `DST_DIGITALOCEAN_TOKEN` respectively in your `.env` file.
+3. Set up the identified tokens as `SRC_DIGITALOCEAN_TOKEN` and `DST_DIGITALOCEAN_TOKEN` respectively in your `.env` file.
 
 ### Identifying Volume ID
 
