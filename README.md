@@ -78,7 +78,7 @@ To determine the `VOLUME_ID` for the volume snapshot you wish to transfer, use t
 
    Start by creating a snapshot and preparing it for transfer:
    ```bash
-   ./snapswap_tool.sh create-snapshot
+   ./snapswap.sh create-snapshot
    ```
 
    After running the above command, SnapSwap will guide you through the manual steps required to complete the snapshot 
@@ -88,7 +88,7 @@ To determine the `VOLUME_ID` for the volume snapshot you wish to transfer, use t
 
    Once you've completed the manual snapshot transfer, proceed with the following:
    ```bash
-   ./snapswap_tool.sh finalize
+   ./snapswap.sh finalize
    ```
 
    This step will complete the process, performing any necessary post-transfer tasks to ensure the volume snapshot is properly 
