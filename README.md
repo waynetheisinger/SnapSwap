@@ -1,7 +1,3 @@
-Certainly! Based on our conversation and the context provided, here's a draft for the first three sections of the `SnapSwap` README:
-
----
-
 # SnapSwap
 
 ## 1. Introduction
@@ -10,29 +6,41 @@ Certainly! Based on our conversation and the context provided, here's a draft fo
 **SnapSwap** is an innovative open-source tool designed to simplify and automate the process of transferring volume snapshots between teams on DigitalOcean. Born out of the specific challenges faced in managing volume snapshots across different teams, SnapSwap streamlines the procedure, minimizing manual intervention and maximizing efficiency.
 
 ### Motivation
-While DigitalOcean offers a robust set of features, transferring volume snapshots between teams wasn't one of them, at least as of 2022. DigitalOcean users frequently found themselves needing to share snapshots across teams but were faced with a cumbersome process. SnapSwap was created to bridge this gap, providing a solution that is both quick and easy to implement.
+Transferring volume snapshots between DigitalOcean teams often presented users with a cumbersome process. SnapSwap was developed to bridge this gap, providing a solution that is both quick and easy to implement.
 
 ## 2. Features
 
-- **Automated Snapshot Transfer**: Reduce manual steps and potential errors by automating the transfer of volume snapshots between DigitalOcean teams.
-  
-- **Integration with Popular IaC Tools**: Designed to seamlessly integrate with infrastructure as code tools such as Terraform and configuration management tools like Ansible, making it a versatile solution for diverse infrastructures.
-  
-- **User-Friendly**: SnapSwap aims to offer an intuitive user experience, making snapshot transfers straightforward even for those not deeply familiar with DigitalOcean's internals.
+- Automated Snapshot Transfer: Seamlessly move volume snapshots between DigitalOcean teams with reduced manual steps.
+- Integration with IaC Tools: Designed to integrate with tools like Terraform and Ansible for a comprehensive infrastructure solution.
+- User-Friendly: An intuitive process designed for users of all expertise levels.
 
----
+## 3. Prerequisites & Setup
 
-## 3. Prerequisites
+### Tools & Dependencies
+Ensure you have the following tools installed and configured:
+- Packer
+- Terraform
+- Ansible
 
-Before diving into SnapSwap, ensure you have the following:
+### DigitalOcean API Token
+Before using SnapSwap, you'll need an API token from DigitalOcean for the source and target teams:
 
-- **DigitalOcean API Tokens**: API tokens for both the source and target teams are essential. These tokens provide SnapSwap the necessary permissions to manage and transfer snapshots.
+1. **Environment Variable**: You can set up the `DIGITALOCEAN_TOKEN` directly in your environment:
+   ```bash
+   export DIGITALOCEAN_TOKEN="your_api_token"
+   ```
 
-- **Environment Setup**: Familiarity with DigitalOcean's environment, especially in terms of volume and snapshot management.
+2. **Using an .env File**: Alternatively, SnapSwap supports loading your API token from an `.env` file. This method is especially useful to avoid setting up the token every time or to share configurations among a team without exposing sensitive information.
 
-- **Tool Dependencies**: SnapSwap is designed to work seamlessly with specific infrastructure tools. As such, you must have:
-  - **Packer**: Used to automate the build process of the intermediary DigitalOcean Droplet.
-  - **Terraform**: Responsible for orchestrating the resource creation in the target team.
-  - **Ansible**: Manages the data transfer and volume setup on the Droplets.
+   Create an `.env` file in the root directory of SnapSwap and add the following:
+   ```bash
+   export DIGITALOCEAN_TOKEN="your_api_token"
+   ```
 
-Ensure all three tools are installed and properly configured to make full use of SnapSwap.
+   Ensure you add `.env` to your `.gitignore` to prevent accidental exposure of your token in version control:
+   ```bash
+   echo ".env" >> .gitignore
+   ```
+
+3. **Error Handling**: If the `DIGITALOCEAN_TOKEN` is not found in either the environment or the `.env` file, SnapSwap will exit with an error message.
+
