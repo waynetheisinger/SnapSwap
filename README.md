@@ -14,7 +14,7 @@ provides a method that merges automation with manual checks for a safe and strai
 
 - **Two-Phase Transfer**: Breaks down the snapshot transfer into two primary phases, allowing users to have control and 
   visibility over the process.
-- **Integrated with IaC Tools**: Designed to work seamlessly with Packer, Terraform, and Ansible, providing a comprehensive 
+- **Integrated with IaC Tools**: Designed to work seamlessly with Terraform, and Ansible, providing a comprehensive 
   infrastructure solution.
 - **User-Friendly Workflow**: Detailed instructions guide the user through each step, making the process accessible even 
   for those unfamiliar with DigitalOcean's infrastructure.
@@ -25,7 +25,6 @@ provides a method that merges automation with manual checks for a safe and strai
 
 ### Tools & Dependencies
 Ensure the following tools are installed and properly configured:
-- Packer
 - Terraform
 - Ansible
 - **doctl** - The official DigitalOcean CLI tool. [Installation Instructions](https://www.digitalocean.com/docs/apis-clis/doctl/how-to/install/)

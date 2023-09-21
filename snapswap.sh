@@ -23,12 +23,24 @@ load_env_var() {
 
 # Function to handle snapshot creation and transfer initiation
 create_snapshot() {
+    trap "cd ../; terraform destroy -auto-approve" ERR
+
     # Check for SRC_DIGITALOCEAN_TOKEN in environment or .env file
     load_env_var "SRC_DIGITALOCEAN_TOKEN"
 
-    echo "Starting Packer build..."
-    packer build packer/
-    echo "Packer build completed."
+    echo "Launching droplet and attaching volume..."
+    cd createSnapshot/
+    terraform init
+    terraform apply -auto-approve
+    echo "complete..."
+
+    echo "Moving data from volume to droplet..."
+    ansible-playbook ansible/movetodroplet/playbook.yml
+    echo "complete..."
+
+    # Get snapshot ID from Terraform output
+    SNAPSHOT_ID=$(terraform output snapshot_id)
+    echo "Snapshot ID: $SNAPSHOT_ID"
 
     # Provide user with instructions for the manual step
     echo "Snapshot has been created. Please go to the DigitalOcean Control Panel and:"
@@ -36,24 +48,44 @@ create_snapshot() {
     echo "2. Select the snapshot and choose 'Change Owner' under 'More'."
     echo "3. Enter the destination team's email address and confirm the transfer."
     echo "After the snapshot transfer has been accepted, run this script with 'finalize'."
+
+    # clean up
+    terraform destroy -auto-approve
+    cd ..
+
+    echo "Snapshot creation and initial transfer complete!"
 }
 
 # Function to finalize the process after snapshot transfer
 finalize_transfer() {
+    trap "cd ../; terraform destroy -auto-approve" ERR
+
     # Check for DST_DIGITALOCEAN_TOKEN in environment or .env file
     load_env_var "DST_DIGITALOCEAN_TOKEN"
 
-    echo "Initializing Terraform..."
-    terraform init terraform/
-    echo "Applying Terraform plan..."
-    terraform apply -auto-approve terraform/
-    echo "Terraform apply completed."
+    cd deploySnapshot/
+    echo "Launching droplet..."
+    terraform init
+    terraform apply -auto-approve
+    echo "Complete..."
+    cd ..
 
-    echo "Starting Ansible playbook..."
-    ansible-playbook ansible/playbook.yml
-    echo "Ansible playbook completed."
+    echo "Moving data from droplet to volume..."
+    ansible-playbook ansible/movetovolumen/playbook.yml
+    echo "Complete..."
 
-    echo "Snapshot transfer process finalized!"
+    cd snapshotVolume/
+    echo "Creating snapshot volume..."
+    terraform init
+    terraform apply -auto-approve
+    echo "Complete..."
+
+    echo "Cleaning up..."
+    # clean up
+    terraform destroy -auto-approve
+    cd ..
+
+    echo "Snapshot transfer finalized and resources cleaned up!"
 }
 
 # Check command-line argument
