@@ -52,15 +52,8 @@ Before using SnapSwap, you'll need API tokens for both the source and destinatio
 
    For detailed instructions on managing authentication contexts in `doctl`, please refer to the [official documentation](https://www.digitalocean.com/docs/apis-clis/doctl/how-to/use-multiple-contexts/).
 
-2. **Obtain API Tokens using `doctl`**:
-
-   With the correct context set, list your account's API tokens:
-
-   ```bash
-   doctl account api-tokens list
-   ```
-
-   Identify the appropriate tokens you wish to use for the source and destination teams. If you need to create a new API token, this can be done through the [DigitalOcean Control Panel](https://cloud.digitalocean.com/account/api/tokens).
+2. **Obtain API Tokens using:
+   If you need to create a new API token, this can be done through the [DigitalOcean Control Panel](https://cloud.digitalocean.com/account/api/tokens).
 
 3. Set up the identified tokens as `SRC_DIGITALOCEAN_TOKEN` and `DST_DIGITALOCEAN_TOKEN` respectively in your `.env` file.
 
@@ -71,7 +64,7 @@ To determine the `VOLUME_ID` for the volume snapshot you wish to transfer, use t
 1. **List Volume Snapshots**:
 
    ```bash
-   doctl compute volume list-snapshots
+   doctl compute snapshot list --resource volume
    ```
 
    This command will display a list of volume snapshots along with their respective IDs. Locate the desired snapshot and take note of its ID.
