@@ -3,7 +3,7 @@
 ## 1. Introduction
 
 ### Brief Description
-**SnapSwap** is an innovative open-source tool designed to simplify and automate the process of transferring volume snapshots between teams on DigitalOcean. Born out of the specific challenges faced in managing volume snapshots across different teams, SnapSwap streamlines the procedure, minimizing manual intervention and maximizing efficiency.
+**SnapSwap** is an open-source tool designed to simplify and automate the process of transferring volume snapshots between teams on DigitalOcean. Born out of the specific challenges faced in managing volume snapshots across different teams, SnapSwap streamlines the procedure, minimizing manual intervention and maximizing efficiency.
 
 ### Motivation
 Transferring volume snapshots between DigitalOcean teams often presented users with a cumbersome process. SnapSwap was developed to bridge this gap, providing a solution that is both quick and easy to implement.
