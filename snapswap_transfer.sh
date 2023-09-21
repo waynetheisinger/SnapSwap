@@ -21,25 +21,51 @@ load_env_var() {
     fi
 }
 
-# Check for SRC_DIGITALOCEAN_TOKEN and DST_DIGITALOCEAN_TOKEN in environment or .env file
-load_env_var "SRC_DIGITALOCEAN_TOKEN"
-load_env_var "DST_DIGITALOCEAN_TOKEN"
+# Function to handle snapshot creation and transfer initiation
+create_snapshot() {
+    # Check for SRC_DIGITALOCEAN_TOKEN in environment or .env file
+    load_env_var "SRC_DIGITALOCEAN_TOKEN"
 
-# Packer (Assuming Packer uses SRC_DIGITALOCEAN_TOKEN)
-echo "Starting Packer build..."
-packer build path_to_packer_template.json
-echo "Packer build completed."
+    echo "Starting Packer build..."
+    packer build packer/
+    echo "Packer build completed."
 
-# Terraform (You might need to adjust how Terraform uses SRC and DST tokens)
-echo "Initializing Terraform..."
-terraform init path_to_terraform_directory/
-echo "Applying Terraform plan..."
-terraform apply -auto-approve path_to_terraform_directory/
-echo "Terraform apply completed."
+    # Provide user with instructions for the manual step
+    echo "Snapshot has been created. Please go to the DigitalOcean Control Panel and:"
+    echo "1. Navigate to Images -> Snapshots."
+    echo "2. Select the snapshot and choose 'Change Owner' under 'More'."
+    echo "3. Enter the destination team's email address and confirm the transfer."
+    echo "After the snapshot transfer has been accepted, run this script with 'finalize'."
+}
 
-# Ansible (Ensure Ansible knows which token to use where in the playbook)
-echo "Starting Ansible playbook..."
-ansible-playbook path_to_ansible_playbook.yml
-echo "Ansible playbook completed."
+# Function to finalize the process after snapshot transfer
+finalize_transfer() {
+    # Check for DST_DIGITALOCEAN_TOKEN in environment or .env file
+    load_env_var "DST_DIGITALOCEAN_TOKEN"
 
-echo "Snapshot transfer completed!"
+    echo "Initializing Terraform..."
+    terraform init terraform/
+    echo "Applying Terraform plan..."
+    terraform apply -auto-approve terraform/
+    echo "Terraform apply completed."
+
+    echo "Starting Ansible playbook..."
+    ansible-playbook ansible/playbook.yml
+    echo "Ansible playbook completed."
+
+    echo "Snapshot transfer process finalized!"
+}
+
+# Check command-line argument
+case "$1" in
+    create-snapshot)
+        create_snapshot
+        ;;
+    finalize)
+        finalize_transfer
+        ;;
+    *)
+        echo "Usage: $0 {create-snapshot|finalize}"
+        exit 1
+        ;;
+esac

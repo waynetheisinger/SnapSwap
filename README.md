@@ -1,47 +1,86 @@
-Absolutely. Let's adjust the README to reflect the changes related to having both a source and destination DigitalOcean token.
-
----
-
 # SnapSwap
 
 ## 1. Introduction
 
 ### Brief Description
-**SnapSwap** is an innovative open-source tool designed to facilitate and automate the process of transferring volume snapshots between teams on DigitalOcean. Born out of specific challenges encountered when managing volume snapshots across various teams, SnapSwap aims to provide a streamlined procedure that reduces manual intervention and boosts efficiency.
+**SnapSwap** is an innovative open-source tool designed to facilitate and automate the process of transferring volume 
+snapshots between teams on DigitalOcean.
 
 ### Motivation
-The complexity of transferring volume snapshots between DigitalOcean teams often presented users with a cumbersome procedure. SnapSwap emerged as a solution to bridge this gap, offering a method that is both swift and straightforward to implement.
+The complexity of transferring volume snapshots between DigitalOcean teams required a more streamlined process. SnapSwap
+provides a method that merges automation with manual checks for a safe and straightforward transfer experience.
 
 ## 2. Features
 
-- Automated Snapshot Transfer: Seamless movement of volume snapshots between DigitalOcean teams with minimized manual steps.
-- Integration with IaC Tools: Designed to synergize with tools such as Terraform and Ansible, delivering a comprehensive infrastructure solution.
-- User-Friendly: A user-centric approach ensures the process is intuitive and accessible for users of varying expertise.
+- **Two-Phase Transfer**: Breaks down the snapshot transfer into two primary phases, allowing users to have control and 
+- visibility over the process.
+- **Integrated with IaC Tools**: Designed to work seamlessly with Packer, Terraform, and Ansible, providing a comprehensive 
+  infrastructure solution.
+- **User-Friendly Workflow**: Detailed instructions guide the user through each step, making the process accessible even 
+  for those unfamiliar with DigitalOcean's infrastructure.
 
 ## 3. Prerequisites & Setup
 
 ### Tools & Dependencies
-Ensure the following tools are installed and correctly configured:
+Ensure the following tools are installed and properly configured:
 - Packer
 - Terraform
 - Ansible
 
-### DigitalOcean API Tokens
-SnapSwap requires API tokens from DigitalOcean for both the source and destination teams:
+### DigitalOcean API Tokens and Volume ID
 
-1. **Environment Variables**: Set up the `SRC_DIGITALOCEAN_TOKEN` and `DST_DIGITALOCEAN_TOKEN` in your environment:
+Before using SnapSwap, set up the `SRC_DIGITALOCEAN_TOKEN` and `DST_DIGITALOCEAN_TOKEN` for the source and destination teams, 
+as well as the `VOLUME_ID` of the volume you intend to copy, in the `.env` file.
+
+## 4. Usage
+
+1. **Snapshot Creation and Transfer Initiation**:
+
+   Start by creating a snapshot and preparing it for transfer:
    ```bash
-   export SRC_DIGITALOCEAN_TOKEN="your_source_api_token"
-   export DST_DIGITALOCEAN_TOKEN="your_destination_api_token"
+   ./snapswap_tool.sh create-snapshot
    ```
 
-2. **Using an .env File**: For added convenience, SnapSwap supports loading your API tokens from an `.env` file. This method is especially handy for avoiding repetitive token setups or sharing configurations amongst teams without revealing sensitive data.
+   After running the above command, SnapSwap will guide you through the manual steps required to complete the snapshot 
+   transfer via the DigitalOcean Control Panel.
 
-   Create an `.env` file in the root directory of SnapSwap with the following content:
+2. **Finalize Transfer**:
+
+   Once you've completed the manual snapshot transfer, proceed with the following:
    ```bash
-   export SRC_DIGITALOCEAN_TOKEN="your_source_api_token"
-   export DST_DIGITALOCEAN_TOKEN="your_destination_api_token"
+   ./snapswap_tool.sh finalize
    ```
 
-3. **Error Handling**: Should the `SRC_DIGITALOCEAN_TOKEN` or `DST_DIGITALOCEAN_TOKEN` not be located either in the environment or the `.env` file, SnapSwap will terminate with an error message.
+   This step will complete the process, performing any necessary post-transfer tasks to ensure the snapshot is properly 
+   set up in the destination team.
+
+---
+
+## 5. Handling the `.env` File
+
+The repository includes a dummy `.env` file to help users set up their environment variables. 
+After setting up your own configuration in the `.env` file, you will want to avoid tracking changes to this file to 
+prevent accidentally committing personal or sensitive information.
+
+To ensure your changes to `.env` are not tracked by Git:
+
+```bash
+git update-index --assume-unchanged .env
+```
+
+By running this command, Git will ignore future changes to the `.env` file locally.
+
+**Important**: Each collaborator or user who clones the repository and modifies the `.env` file should run the above 
+command to ensure their changes remain untracked.
+
+If, at any point, you wish to commit changes to the `.env` file again, use:
+
+```bash
+git update-index --no-assume-unchanged .env
+```
+
+This will tell Git to track changes to the `.env` file once more.
+
+
+
 
