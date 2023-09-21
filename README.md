@@ -3,7 +3,7 @@
 ## 1. Introduction
 
 ### Brief Description
-**SnapSwap** is an innovative open-source tool designed to facilitate and automate the process of transferring volume 
+**SnapSwap** is an open-source tool designed to facilitate and automate the process of transferring volume 
 snapshots between teams on DigitalOcean.
 
 ### Motivation
@@ -13,25 +13,54 @@ provides a method that merges automation with manual checks for a safe and strai
 ## 2. Features
 
 - **Two-Phase Transfer**: Breaks down the snapshot transfer into two primary phases, allowing users to have control and 
-- visibility over the process.
+  visibility over the process.
 - **Integrated with IaC Tools**: Designed to work seamlessly with Packer, Terraform, and Ansible, providing a comprehensive 
   infrastructure solution.
 - **User-Friendly Workflow**: Detailed instructions guide the user through each step, making the process accessible even 
   for those unfamiliar with DigitalOcean's infrastructure.
 
-## 3. Prerequisites & Setup
+---
+
+## Prerequisites & Setup
 
 ### Tools & Dependencies
 Ensure the following tools are installed and properly configured:
 - Packer
 - Terraform
 - Ansible
+- **doctl** - The official DigitalOcean CLI tool. [Installation Instructions](https://www.digitalocean.com/docs/apis-clis/doctl/how-to/install/)
 
-### DigitalOcean API Tokens and Volume ID
+### DigitalOcean API Tokens
 
-Before using SnapSwap, set up the `SRC_DIGITALOCEAN_TOKEN` and `DST_DIGITALOCEAN_TOKEN` for the source and destination teams, 
-as well as the `VOLUME_ID` of the volume you intend to copy, in the `.env` file.
+Before using SnapSwap, you'll need API tokens for both the source and destination teams.
 
+1. **Obtain API Tokens using `doctl`**:
+
+   If you've set up `doctl` with access to your DigitalOcean account, you can list your account's API tokens using:
+
+   ```bash
+   doctl account api-tokens list
+   ```
+
+   Identify the appropriate tokens you wish to use for the source and destination teams. If you need to create a new API token, this can be done through the [DigitalOcean Control Panel](https://cloud.digitalocean.com/account/api/tokens).
+
+2. Set up the identified tokens as `SRC_DIGITALOCEAN_TOKEN` and `DST_DIGITALOCEAN_TOKEN` respectively in your `.env` file.
+
+### Identifying Volume ID
+
+To determine the `VOLUME_ID` for the volume snapshot you wish to transfer, use the `doctl` CLI:
+
+1. **List Volume Snapshots**:
+
+   ```bash
+   doctl compute volume list-snapshots
+   ```
+
+   This command will display a list of volume snapshots along with their respective IDs. Locate the desired snapshot and take note of its ID.
+
+2. Update this ID as the `VOLUME_ID` in your `.env` file.
+
+---
 ## 4. Usage
 
 1. **Snapshot Creation and Transfer Initiation**:
@@ -51,7 +80,7 @@ as well as the `VOLUME_ID` of the volume you intend to copy, in the `.env` file.
    ./snapswap_tool.sh finalize
    ```
 
-   This step will complete the process, performing any necessary post-transfer tasks to ensure the snapshot is properly 
+   This step will complete the process, performing any necessary post-transfer tasks to ensure the volume snapshot is properly 
    set up in the destination team.
 
 ---
