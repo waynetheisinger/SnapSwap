@@ -1,0 +1,17 @@
+---
+- name: Copy /mnt/volume_src_volume to /data-transfer
+  hosts: droplet
+  tasks:
+    - name: Ensure /data-transfer directory exists
+      ansible.builtin.file:
+        path: /data-transfer
+        state: directory
+        mode: '0755'
+
+    - name: Copy content from /mnt/volume_src_volume to /data-transfer
+      ansible.builtin.synchronize:
+        src: /mnt/volume_src_volume/
+        dest: /data-transfer/
+        recursive: yes
+        archive: yes
+        delete: no

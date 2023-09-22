@@ -27,20 +27,63 @@ create_snapshot() {
 
     # Check for SRC_DIGITALOCEAN_TOKEN in environment or .env file
     load_env_var "SRC_DIGITALOCEAN_TOKEN"
+    load_env_var "VOLUME_SNAPSHOT_NAME_REGEX"
+    load_env_var "SRC_REGION"
+    load_env_var "SRC_VOLUME_SIZE"
 
     echo "Launching droplet and attaching volume..."
-    cd createSnapshot/
+    cd createDroplet/
     terraform init
-    terraform apply -auto-approve
+    terraform apply -auto-approve \
+    -var do_token="$SRC_DIGITALOCEAN_TOKEN" \
+    -var volume_snapshot_name_regex="VOLUME_SNAPSHOT_NAME_REGEX" \
+    -var src_region="$SRC_REGION" \
+    -var src_volume_size="$SRC_VOLUME_SIZE"
     echo "complete..."
 
+    # Get details from Terraform output
+    DROPLET_NAME=$(terraform output droplet_name)
+    VOLUME_NAME=$(terraform output volume_name)
+
+    # Provide user with the details
+    echo "Created Droplet Name: $DROPLET_NAME"
+    echo "Created Volume Name: $VOLUME_NAME"
+    echo "Continuing..."
+
     echo "Moving data from volume to droplet..."
-    ansible-playbook ansible/movetodroplet/playbook.yml
+    ansible-playbook -i ansible/main.ini ansible/copyToDroplet.yml
     echo "complete..."
+
+    # create the snapshot
+    terraform apply -auto-approve \
+    -var do_token="$SRC_DIGITALOCEAN_TOKEN" \
+    -var create_snapshot="true"
 
     # Get snapshot ID from Terraform output
     SNAPSHOT_ID=$(terraform output snapshot_id)
+    NAME=$(terraform output name)
+    REGIONS=$(terraform output regions)
+    MIN_DISK_SIZE=$(terraform output min_disk_size)
+
+    # Provide user with snapshot details
     echo "Snapshot ID: $SNAPSHOT_ID"
+    echo "Name: $NAME"
+    echo "Regions: $REGIONS"
+    echo "Min Disk Size: $MIN_DISK_SIZE"
+    echo "Please confirm the above details for the DEST vars in your .env before continuing. /
+    Also please confirm that the SRC MIN_DISK_SIZE is correct or clean up will fail which will result in a charge."
+
+    # Prompt the user and wait for confirmation
+    read -pr "Are the above details correct? (yes/no) " response
+
+    # Check the user's response
+    while true; do
+        case $response in
+            [Yy]* ) break;;  # Exit the loop if user confirms
+            [Nn]* ) exit 1;; # Exit the script if user denies
+            * ) echo "Please answer yes or no."; read -p "Are the above details correct? (yes/no) " response;; # Prompt again if the response is not 'yes' or 'no'
+        esac
+    done
 
     # Provide user with instructions for the manual step
     echo "Snapshot has been created. Please go to the DigitalOcean Control Panel and:"
@@ -50,7 +93,8 @@ create_snapshot() {
     echo "After the snapshot transfer has been accepted, run this script with 'finalize'."
 
     # clean up
-    terraform destroy -auto-approve
+    terraform state rm digitalocean_droplet.web-snapshot
+    terraform destroy -auto-approve -var do_token="$SRC_DIGITALOCEAN_TOKEN"
     cd ..
 
     echo "Snapshot creation and initial transfer complete!"
@@ -66,7 +110,7 @@ finalize_transfer() {
     cd deploySnapshot/
     echo "Launching droplet..."
     terraform init
-    terraform apply -auto-approve
+    terraform apply -auto-approve -var do_token="$DST_DIGITALOCEAN_TOKEN"
     echo "Complete..."
     cd ..
 
@@ -77,12 +121,12 @@ finalize_transfer() {
     cd snapshotVolume/
     echo "Creating snapshot volume..."
     terraform init
-    terraform apply -auto-approve
+    terraform apply -auto-approve -var do_token="$DST_DIGITALOCEAN_TOKEN"
     echo "Complete..."
 
     echo "Cleaning up..."
     # clean up
-    terraform destroy -auto-approve
+    terraform destroy -auto-approve do_token="$SRC_DIGITALOCEAN_TOKEN"
     cd ..
 
     echo "Snapshot transfer finalized and resources cleaned up!"
